@@ -56,4 +56,4 @@ function App() {
 
 ## License
 
-MIT © [jurjees23](https://github.com/jurjees23)
+MIT © [GoPlugin](https://github.com/GoPlugin/)

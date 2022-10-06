@@ -2,7 +2,7 @@
   "name": "pli-pay",
   "version": "1.0.0",
   "description": "Crypto PLI payment gateway ",
-  "author": "jurjees23",
+  "author": "GoPlugin",
   "license": "MIT",
   "repository": "GoPlugin/pli-pay",
   "main": "dist/index.js",
@@ -18,7 +18,7 @@
     "goplugin",
     "crypto gateway"
   ],
-  "homepage": "https://github.com/piyushswain/react-rails-pagination",
+  "homepage": "https://github.com/GoPlugin/pli-pay",
   "scripts": {
     "build": "microbundle-crl --no-compress --format modern,cjs",
     "start": "microbundle-crl watch --no-compress --format modern,cjs",
