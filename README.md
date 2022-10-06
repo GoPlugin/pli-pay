@@ -34,10 +34,6 @@ function App() {
 
 ## Required Parameter
 
-
-
-
-
 | Parameter | Type     | Description                | Values                      |
 | :-------- | :------- | :------------------------- |:----------------------------
 | `chainId` | `string` | **Specify network**.                     |  50(Mainnet)  (or) 51(Apothem)
@@ -52,6 +48,31 @@ function App() {
 
 
 
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/GoPlugin/pli-pay
+```
+
+Go to the project directory
+
+```bash
+  cd example
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm run start
+```
 
 
 ## License
