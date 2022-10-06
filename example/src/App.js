@@ -1,10 +1,18 @@
 import React from 'react'
 
-import { ExampleComponent } from 'pli-pay'
+import Paypli from 'pli-pay'
 import 'pli-pay/dist/index.css'
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  return <Paypli
+    chainId={51}
+    paymethod={"PLI"}
+    receiverAddress={"0xb22e6413893a796714132a309cd7d4ec2ac4587b"}
+    amount={"10"}
+    onSuccess={(data) => console.log("onSuccess", data)}
+    onFailure={(data) => console.log("onFailure", data)}
+    onError={(data) => console.log("onError", data)}
+  />
 }
 
 export default App

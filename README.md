@@ -1,29 +1,58 @@
-# pli-pay
 
-> Crypto PLI payment gateway 
+# PLI Crypto Payment Gateway
 
-[![NPM](https://img.shields.io/npm/v/pli-pay.svg)](https://www.npmjs.com/package/pli-pay) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+A package to accept PLI token as Payment in your website or web application
+ 
 
-## Install
+## Installation
+
+Install my-project with npm
 
 ```bash
-npm install --save pli-pay
+  npm install --save pli-pay
 ```
+    
+## Usage/Examples
 
-## Usage
-
-```jsx
-import React, { Component } from 'react'
-
-import MyComponent from 'pli-pay'
+```javascript
+import Paypli from 'pli-pay'
 import 'pli-pay/dist/index.css'
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
-  }
+function App() {
+  return <Paypli
+    chainId={51}
+    paymethod={"PLI"}
+    receiverAddress={"0xb22e6413893a796714132a309cd7d4ec2ac4587b"}
+    amount={"10"}
+    onSuccess={(data) => console.log("onSuccess", data)}
+    onFailure={(data) => console.log("onFailure", data)}
+    onError={(data) => console.log("onError", data)}
+  />
 }
 ```
+
+
+## Required Parameter
+
+
+
+
+
+| Parameter | Type     | Description                | Values                      |
+| :-------- | :------- | :------------------------- |:----------------------------
+| `chainId` | `string` | **Specify network**.                     |  50(Mainnet)  (or) 51(Apothem)
+| `paymethod` | `string` | **Specify payment method**.                   |  XDC  (or) PLI
+| `receiverAddress` | `string` | **Valid Wallet Address**. |  XDC Wallet Address
+| `amount` | `string` | **Amount to received**.                      |  eg:10
+| `onSuccess` | `function` |                |  Capture Success Response
+| `onFailure` | `function` |                    |  Capture Failure Response
+| `onError` | `function` |                    |  Capture Error Response
+
+
+
+
+
+
 
 ## License
 
