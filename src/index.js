@@ -126,6 +126,7 @@ export default function Paypli(props) {
 
         if (parseFloat(tokenValue) < parseFloat(props.amount)) {
           props.onError({ msg: "Low Token Balance" });
+          setbtnLabel(`Pay With ${props.paymethod}`)
           return;
         }
         var amountInWei = ethers.utils.parseUnits(props.amount, 18)

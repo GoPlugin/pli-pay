@@ -3,7 +3,6 @@
 
 A package to accept PLI token as Payment in your website or web application
 
-PLI Currently available in Testnet Apothem only
  
 
 ## Installation
