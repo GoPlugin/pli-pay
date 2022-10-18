@@ -100,7 +100,7 @@ export default function Paypli(props) {
       const address = await signer.getAddress();
 
       setbtnLabel("Processing...")
-
+      var transactionHash;
       //CALL TRANSACTION
       if (props.paymethod === "XDC") {
         const params = [{
@@ -108,7 +108,7 @@ export default function Paypli(props) {
           to: props.receiverAddress,
           value: ethers.utils.parseUnits(props.amount, 'ether').toHexString()
         }];
-        var transactionHash = await providerConnect.send('eth_sendTransaction', params)
+        transactionHash = await providerConnect.send('eth_sendTransaction', params)
 
       } else if (props.paymethod === "PLI") {
 
@@ -131,7 +131,7 @@ export default function Paypli(props) {
           return;
         }
         var amountInWei = ethers.utils.parseUnits(props.amount, 18)
-        var transactionHash = await paymentTokenInstance
+        transactionHash = await paymentTokenInstance
           .transfer(props.receiverAddress, amountInWei)
         transactionHash = transactionHash.hash
       } else {
