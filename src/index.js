@@ -17,7 +17,7 @@ export default function Paypli(props) {
 
 
   useEffect(() => {
-    setbtnLabel(`Pay With ${props.paymethod}`)
+    setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
   }, [])
 
 
@@ -44,13 +44,14 @@ export default function Paypli(props) {
       walletconnect: {
         package: WalletConnect, // required
         options: {
+          infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
           rpc: {
-            50: "https://rpc.xinfin.network",
-            51: "https://rpc.apothem.network"
+            50: "https://cors.goplugin.co/https://xdcpayrpc.blocksscan.io/",
+            51: "https://cors.goplugin.co/https://apothemxdcpayrpc.blocksscan.io/",
           },
         }
       },
-      'custom-xdc': getXdcModal,
+      // 'custom-xdc': getXdcModal,
     }
   });
 
@@ -126,7 +127,7 @@ export default function Paypli(props) {
 
         if (parseFloat(tokenValue) < parseFloat(props.amount)) {
           props.onError({ msg: "Low Token Balance" });
-          setbtnLabel(`Pay With ${props.paymethod}`)
+          setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
           return;
         }
         var amountInWei = ethers.utils.parseUnits(props.amount, 18)
@@ -146,12 +147,12 @@ export default function Paypli(props) {
         return
       }
       props.onSuccess({ hash: transactionHash, success: true })
-      setbtnLabel(`Pay With ${props.paymethod}`)
+      setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
 
     } catch (err) {
       console.log("err", err)
       props.onError(err);
-      setbtnLabel(`Pay With ${props.paymethod}`)
+      setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
 
     }
   }
