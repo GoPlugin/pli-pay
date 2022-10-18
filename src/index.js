@@ -39,7 +39,7 @@ export default function Paypli(props) {
 
   const web3Modal = new Web3Modal({
     cacheProvider: true,
-    disableInjectedProvider: false,
+    disableInjectedProvider: true,
     providerOptions: {
       walletconnect: {
         package: WalletConnect, // required
@@ -51,7 +51,7 @@ export default function Paypli(props) {
           },
         }
       },
-      // 'custom-xdc': getXdcModal,
+      'custom-xdc': getXdcModal,
     }
   });
 
