@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { getXdcModal } from 'xdcpay-web3modal'
 import detectEthereumProvider from '@metamask/detect-provider'
 import styles from './styles.module.css'
-import { contractData } from './contract/PLI';
+import { contractData, coingekoIds } from './contract/data';
 
 
 export default function Paypli(props) {
@@ -13,11 +13,43 @@ export default function Paypli(props) {
   const [disable, setDisable] = useState(false)
   const [btnLabel, setbtnLabel] = useState()
   const [provider, setprovider] = useState({})
+  const [coingekoID, setcoingekoID] = useState({})
+  const [amount, setamount] = useState("0")
+  const [basePrice, setbasePrice] = useState(0)
+
+
+
+
 
 
 
   useEffect(() => {
-    setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
+    if (!props.amount || props.amount === "") {
+      errorResponse.amount = errorMsg["amount"]
+      return null;
+    }
+    var findIds = coingekoIds[props.paymethod];
+    console.log("Find IDS", findIds)
+    if (findIds) {
+      setcoingekoID(findIds)
+      fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${findIds}&vs_currencies=${props.fiatcurrency}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)
+          var resAmount = data[findIds][props.fiatcurrency];
+          setbasePrice(resAmount)
+          var calculate = parseFloat(props.amount) * parseFloat(resAmount).toFixed(4)
+
+          setamount(calculate.toString())
+          setbtnLabel(`Pay ${calculate} ${props.paymethod}`)
+        })
+        .catch((err) => console.log(err))
+    } else {
+      props.onError({ paymethod: "Pay Method Not Available" });
+      return null;
+    }
+
+
   }, [])
 
 
@@ -46,8 +78,8 @@ export default function Paypli(props) {
         options: {
           infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
           rpc: {
-            50: "https://cors.goplugin.co/https://xdcpayrpc.blocksscan.io/",
-            51: "https://cors.goplugin.co/https://apothemxdcpayrpc.blocksscan.io/",
+            50: "https://xdcpayrpc.blocksscan.io/",
+            51: "https://apothemxdcpayrpc.blocksscan.io/",
           },
         }
       },
@@ -68,6 +100,11 @@ export default function Paypli(props) {
     }
     if (!props.paymethod || props.paymethod === "") {
       errorResponse.paymethod = errorMsg["paymethod"]
+    }
+
+    if (parseFloat(amount) === 0) {
+      props.onError({ amount: "Amount must be greater than 0" });
+
     }
 
     try {
@@ -106,15 +143,24 @@ export default function Paypli(props) {
         const params = [{
           from: address,
           to: props.receiverAddress,
-          value: ethers.utils.parseUnits(props.amount, 'ether').toHexString()
+          value: ethers.utils.parseUnits(amount, 'ether').toHexString()
         }];
         transactionHash = await providerConnect.send('eth_sendTransaction', params)
 
-      } else if (props.paymethod === "PLI") {
+      } else if (props.paymethod != "XDC") {
+
+        var temppaymethod = props.paymethod;
+        var findpay = contractData[temppaymethod]
+        if (!findpay) {
+          props.onError({ paymethod: "Pay Method Not Available" });
+          setbtnLabel(`Pay ${amount} ${props.paymethod}`)
+          return null;
+        }
+
 
         // const { contractData } = require(`./contract/PLI`)
-        var ADDRESS = contractData[chainId].ADDRESS;
-        var ABI = contractData[chainId].ABI
+        var ADDRESS = findpay[chainId].ADDRESS;
+        var ABI = findpay[chainId].ABI
         var paymentTokenInstance = new ethers.Contract(
           ADDRESS,
           ABI,
@@ -125,17 +171,18 @@ export default function Paypli(props) {
           .balanceOf(address)
         const tokenValue = ethers.utils.formatEther(tokenbalance);
 
-        if (parseFloat(tokenValue) < parseFloat(props.amount)) {
+        if (parseFloat(tokenValue) < parseFloat(amount)) {
           props.onError({ msg: "Low Token Balance" });
-          setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
+          setbtnLabel(`Pay ${amount} ${props.paymethod}`)
           return;
         }
-        var amountInWei = ethers.utils.parseUnits(props.amount, 18)
+        var amountInWei = ethers.utils.parseUnits(amount, 18)
         transactionHash = await paymentTokenInstance
           .transfer(props.receiverAddress, amountInWei)
         transactionHash = transactionHash.hash
       } else {
         props.onError({ paymethod: "Pay Method Not Available" });
+        setbtnLabel(`Pay ${amount} ${props.paymethod}`)
         return null;
       }
 
@@ -143,16 +190,16 @@ export default function Paypli(props) {
       //CHECK TRANSACTION STATUS
       const [txhash, status] = await getTxnStatus(transactionHash, providerConnect);
       if (!status) {
-        props.onFailure({ hash: transactionHash, success: false, msg: "Error Occured on Blockchain" })
+        props.onFailure({ hash: transactionHash, success: false, msg: "Error Occured on Blockchain", })
         return
       }
-      props.onSuccess({ hash: transactionHash, success: true })
-      setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
+      props.onSuccess({ hash: transactionHash, success: true, fiatcurrency: props.fiatcurrency, amount: props.amount, paymethod: props.paymethod, receiverAddress: props.receiverAddress })
+      setbtnLabel(`Pay ${amount} ${props.paymethod}`)
 
     } catch (err) {
       console.log("err", err)
       props.onError(err);
-      setbtnLabel(`Pay ${props.amount} ${props.paymethod}`)
+      setbtnLabel(`Pay ${amount} ${props.paymethod}`)
 
     }
   }
@@ -175,13 +222,16 @@ export default function Paypli(props) {
   }
 
   return (
-    <button
-      onClick={onConnect}
-      disabled={disable}
-      className={`${styles.apple_pay_button} ${styles.apple_pay_button_black} ${disable && styles.btn_disabled}`}
-    >
-      {btnLabel}
-    </button>
+    <React.Fragment>
+      <button
+        onClick={onConnect}
+        disabled={disable}
+        className={`${props.style} ${disable && styles.btn_disabled}`}
+      >
+        {btnLabel}
+      </button><br />
+      <small style={{ fontSize: 10 }}>1 {props.fiatcurrency} = {basePrice} {props.paymethod}</small>
+    </React.Fragment>
   )
 }
 
